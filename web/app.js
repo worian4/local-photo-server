@@ -11,10 +11,6 @@ function ensureThumbUrl(url, scope) {
   return url;
 }
 
-// app.js — client-side logic (ES module)
-// Modifications: improved trash icon used in index.html, keep topbar visible while cursor is over it,
-// allow native context menu when right-clicking the viewed photo, and add a small "More" popup showing date.
-
 const BLOCKS_PER_LOAD = 4;
 const M_HEIGHT = 120; // constant thumbnail height (used as baseline)
 let token = localStorage.getItem('jwt') || null;
@@ -219,12 +215,11 @@ const overlayImg = document.getElementById('overlay-img');
 const overlayLoader = document.getElementById('overlay-loader');
 const leftBtn = document.getElementById('left-btn');
 const rightBtn = document.getElementById('right-btn');
-// close button removed: keep safe guard if exists
 const closeBtn = document.getElementById('close-btn');
 let currentList = [];
 let currentIndex = 0;
 
-// topbar elements (new)
+// topbar elements
 const overlayTopbar = document.getElementById('overlay-topbar');
 const confirmModal = document.getElementById('confirm-modal');
 const confirmYesBtn = document.getElementById('confirm-yes');
