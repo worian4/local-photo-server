@@ -1,0 +1,480 @@
+:root{
+  --sidebar-w:260px;
+  --m-height:120px;
+  --gap:10px;
+  --top-h:56px;
+  --sidebar-bg:#f8fafc;
+  --sidebar-border:1px solid #e6eef6;
+}
+*{box-sizing:border-box}html,body,#app{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial}
+body{padding-top:var(--top-h)} /* ensure top strip doesn't cover content */
+.app{display:flex;height:calc(100vh - var(--top-h))}
+.top-strip{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:var(--top-h);
+  background:var(--sidebar-bg);
+  border-bottom:var(--sidebar-border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 18px;
+  gap:12px;
+  z-index:35; /* must be above sidebar (30) but below overlay (40) */
+  box-shadow:0 6px 12px rgba(2,6,23,0.04);
+}
+.top-left{display:flex;align-items:center;gap:12px}
+.top-brand{font-weight:700;font-size:18px;color:#0b1220}
+.top-right{display:flex;align-items:center;gap:8px}
+.top-btn{position:relative;overflow:visible;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+  font-size:20px;
+  font-weight:700;
+  cursor:pointer;
+  padding:0;
+}
+
+.icon-gear{display:block}
+
+/* Softer hover effect without white square / sharp border */
+
+.top-btn::before{
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+  border-radius: 12px;
+  /* stronger translucent backdrop without blur so it is visible */
+  background: rgba(2,6,23,0.12);
+  border: none;
+  box-shadow: 0 8px 20px rgba(2,6,23,0.12);
+  opacity: 0;
+  transform: scale(0.985);
+  transition: opacity .12s ease, transform .12s ease;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.top-btn:hover::before{
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+.circle-mark{
+  display:inline-block;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:linear-gradient(180deg,#ffffff,#e6eef6);
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,0.03);
+  margin:0;
+}
+
+/* Sidebar (keep original z-index but shift visually under top strip) */
+.sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);padding:18px;border-right:1px solid #e6eef6;display:flex;flex-direction:column;gap:12px;transition:transform .22s ease,box-shadow .22s ease;z-index:30}
+.brand{display:none;margin:0 0 6px 0;font-size:18px} /* moved to top-strip */
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav-btn{padding:10px;border:0;background:#fff;border-radius:8px;text-align:left;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,0.03)}
+.nav-btn.active{background:#e6f4ff}
+.uploader{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.file-label{display:inline-flex;align-items:center;gap:8px;padding:8px;background:#fff;border-radius:8px;cursor:pointer}
+.file-label input{display:none}
+.uploader select, .uploader button{padding:8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.login{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.login input{padding:8px;border-radius:8px;border:1px solid #ddd;background:#fff}
+
+.main{flex:1;overflow:auto;padding:18px;background:linear-gradient(180deg,#ffffff,#fbfdff)}
+.blocks{display:flex;flex-direction:column;gap:20px}
+.block{background:transparent}
+.block .date{font-weight:700;margin-bottom:8px;color:#334155}
+.thumbs{display:flex;flex-wrap:wrap;gap:var(--gap)}
+.thumb{height:var(--m-height);overflow:hidden;border-radius:8px;background:#f0f4f8;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex:0 0 auto}
+.thumb img{height:100%;width:auto;object-fit:cover;display:block}
+.thumb .badge{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,0.5);color:#fff;padding:2px 6px;border-radius:12px;font-size:11px}
+.loader{padding:12px;text-align:center;color:#334155}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:auto;z-index:40;background:rgba(0,0,0,0.85)}
+.overlay.hidden{display:none}
+.overlay img{max-width:92vw;max-height:92vh;width:auto;height:auto;border-radius:8px;box-shadow:0 12px 40px rgba(2,6,23,0.6);transition:width .18s ease,height .18s ease; display:block; object-fit:contain; background:transparent;}
+
+/* Top bar (semi-transparent black, appears on cursor movement) */
+.overlay-topbar{
+  position:absolute;
+  top:var(--top-h);
+  left:50%;
+  transform:translateX(-50%);
+  width:75%;
+  max-width:1100px;
+  background:rgba(0,0,0,0.75);
+  color:#fff;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 10px;
+  gap:8px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .14s ease;
+  z-index:47;
+}
+.overlay-topbar.visible{opacity:1;pointer-events:auto}
+.overlay-topbar-left{display:flex;align-items:center;gap:6px}
+.overlay-topbar-right{display:flex;align-items:center;gap:6px}
+.topbar-btn{
+  background:transparent;
+  border:0;
+  color:inherit;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:8px;
+  cursor:pointer;
+  padding:6px;
+}
+.topbar-btn:hover{background:rgba(255,255,255,0.06)}
+.more-popup{
+  position:absolute;
+  background:#fff;
+  color:#0b1220;
+  min-width:160px;
+  border-radius:8px;
+  padding:8px;
+  box-shadow:0 8px 24px rgba(2,6,23,0.18);
+  z-index:49;
+  display:none;
+}
+.more-popup.visible{display:block}
+.more-popup .mp-row{font-size:13px;padding:6px 4px}
+.more-popup .mp-title{font-weight:700;margin-bottom:6px}
+
+/* Redesigned circular nav buttons */
+.nav-overlay{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:64px;
+  height:64px;
+  border:0;
+  border-radius:50%;
+  background:rgba(0,0,0,0.55);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .12s ease;
+  z-index:46;
+}
+.nav-overlay.left{left:20px}
+.nav-overlay.right{right:20px}
+.nav-overlay.show{opacity:1; pointer-events:auto;}
+.nav-icon{width:28px;height:28px;display:block}
+
+.hidden{display:none}
+
+/* Menu toggle visibility (only shown on narrow screens) */
+.menu-toggle{display:none;background:transparent;border:0;font-size:20px;cursor:pointer;padding:6px;border-radius:8px}
+@media(max-width:900px){
+  :root{--m-height:96px}
+  .menu-toggle{display:block}
+  .top-brand{font-size:16px}
+  .top-strip{padding:8px 12px}
+  .sidebar{
+    position:fixed;
+    left:0;
+    top:var(--top-h);
+    bottom:0;
+    width:var(--sidebar-w);
+    height:calc(100vh - var(--top-h));
+    display:flex;
+    flex-direction:column;
+    padding:12px;
+    transform:translateX(-110%);
+  }
+  .sidebar.open-mobile{transform:translateX(0);box-shadow:0 12px 40px rgba(2,6,23,0.12)}
+  .sidebar.closed-mobile{transform:translateX(-110%)}
+  .main{padding:18px}
+  .uploader{flex-direction:column;gap:6px;align-items:stretch}
+  .nav-overlay.left{left:16px}
+  .nav-overlay.right{right:16px}
+}
+
+/* very small */
+@media(max-width:480px){
+  :root{--m-height:84px;--sidebar-w:100%}
+  .nav-btn{padding:8px;font-size:14px}
+  .overlay img{max-width:98%;max-height:80%}
+  .nav-overlay{width:52px;height:52px;font-size:28px}
+  .nav-icon{width:22px;height:22px}
+}
+
+/* context menu */
+.context-menu{
+  position:fixed;
+  z-index:70;
+  min-width:160px;
+  background:#fff;
+  border:1px solid rgba(2,6,23,0.08);
+  border-radius:8px;
+  box-shadow:0 6px 28px rgba(2,6,23,0.12);
+  padding:6px 6px;
+  display:none;
+}
+.context-menu button{display:block;width:100%;padding:8px 10px;border:0;background:transparent;text-align:left;border-radius:6px;cursor:pointer}
+.context-menu button:hover{background:#f1f5f9}
+.context-menu.show{display:block}
+
+/* preview upload styles */
+.thumb.uploading{filter:brightness(.85);}
+.thumb .preview-overlay{
+  position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.45));border-radius:8px;display:flex;align-items:center;justify-content:center;z-index:6;
+}
+.upload-progress{
+  width:56%;
+  max-width:120px;
+  min-width:56px;
+  height:18px;
+  background:rgba(255,255,255,0.12);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(2,6,23,0.12);
+  position:relative;
+}
+.upload-progress .bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, rgba(0,122,255,0.95), rgba(0,200,150,0.95));
+  transition:width .2s linear;
+}
+.upload-progress .percent{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;color:#fff;font-weight:600;
+}
+
+/* overlay loader */
+.overlay-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:45}
+.overlay-loader.hidden{display:none}
+.spinner{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:5px solid rgba(255,255,255,0.9);
+  border-top-color: rgba(0,122,255,0.95);
+  animation:spin 1s linear infinite;
+  box-shadow:0 6px 20px rgba(2,6,23,0.3);
+}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Confirm modal */
+.confirm-modal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.45);
+  z-index:60;
+}
+.confirm-modal.hidden{display:none}
+.confirm-box{
+  background:#fff;
+  color:#0b1220;
+  min-width:320px;
+  max-width:90%;
+  border-radius:10px;
+  padding:18px;
+  box-shadow:0 18px 48px rgba(2,6,23,0.36);
+  text-align:center;
+}
+.confirm-text{font-size:16px;margin-bottom:14px}
+.confirm-actions{display:flex;gap:12px;justify-content:center;align-items:center}
+/* Buttons: "Да" — white, "Нет" — blue */
+.btn{padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.btn-yes{background:#ffffff;color:#0b1220;border:1px solid rgba(2,6,23,0.06)}
+.btn-yes:hover{background:#f8fafc}
+.btn-no{background:#2b82ff;color:#fff}
+.btn-no:hover{filter:brightness(.95)}
+
+/* Top "+" menu (dropdown under the top-right area) */
+.top-plus-menu{
+  position:absolute;
+  top:calc(var(--top-h) + 8px);
+  right:12px;
+  width:260px;
+  max-width:90vw;
+  background:#fff;
+  border-radius:10px;
+  box-shadow:0 12px 40px rgba(2,6,23,0.12);
+  padding:10px;
+  z-index:60;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.top-plus-menu.hidden{display:none}
+.top-plus-menu .tpm-row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.top-plus-menu .tpm-scope{padding-bottom:4px;border-bottom:1px dashed rgba(2,6,23,0.06)}
+.top-plus-menu .tpm-label{font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.top-plus-menu .top-file-btn{width:100%;display:inline-flex;justify-content:center;padding:8px;border-radius:8px;border:1px solid #e6eef6;background:#fff;cursor:pointer}
+.top-plus-menu .uploader-upload{width:100%;padding:8px;border-radius:8px;border:0;background:#0b79ff;color:#fff;font-weight:700;cursor:pointer}
+.top-plus-menu .uploader-upload.hidden{display:none}
+.top-plus-menu .file-picked{font-size:13px;color:#334155}
+/* ensure dropdown won't overflow off bottom on short viewports */
+@media(max-height:520px){ .top-plus-menu{top:calc(var(--top-h) + 6px);right:8px;max-height:60vh;overflow:auto} }
+
+
+.icon-user{width:18px;height:18px;display:inline-block;vertical-align:middle}
+.user-icon{width:20px;height:20px;display:inline-block;vertical-align:middle}
+.modal-close{position:absolute;right:10px;top:8px;border:0;background:transparent;font-size:20px;cursor:pointer;padding:4px;line-height:1}
+/* ensure modal classes exist (in case previously removed) */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:120;}
+.modal.hidden{display:none;}
+.modal-backdrop{position:absolute;inset:0;background:rgba(2,6,23,0.45);backdrop-filter:blur(2px);}
+.modal-panel{position:relative;background:#fff;border-radius:12px;padding:18px;min-width:320px;max-width:90vw;box-shadow:0 20px 60px rgba(2,6,23,0.18);z-index:121}
+.modal-title{margin:0 0 8px 0;font-size:18px;font-weight:700}
+.modal-body{display:flex;flex-direction:column;gap:8px}
+.auth-input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px}
+.auth-btn{width:100%;padding:10px;border-radius:8px;border:0;background:#0b79ff;color:#fff;font-weight:700;cursor:pointer;margin-top:6px}
+.auth-error{color:#ff4d4f;font-size:13px}
+.user-profile{display:flex;flex-direction:column;gap:8px;align-items:center}
+.user-name{font-weight:700;font-size:16px}
+
+
+
+/* Password toggle (eye) inside input */
+.pass-wrap{position:relative;display:block}
+.pass-wrap .auth-input{padding-right:44px;box-sizing:border-box}
+.pass-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;cursor:pointer;font-size:16px;line-height:1;padding:6px;border-radius:6px}
+.pass-toggle:focus{outline:2px solid rgba(11,121,255,0.2)}
+
+/* Modal close button: move slightly inward and add hover square */
+.modal-close{position:absolute;right:12px;top:12px;border:0;background:transparent;font-size:20px;cursor:pointer;padding:6px;line-height:1;border-radius:6px;transition:box-shadow .12s, background-color .12s}
+.modal-close:hover{background:#f3f4f6;box-shadow:0 0 0 2px rgba(2,6,23,0.06) inset;}
+
+/* Ensure auth-error area remains distinct */
+.auth-error{color:#ff4d4f;font-size:13px;margin-top:6px}
+
+
+/* --- Multi-select UI for thumbnails --- */
+.thumb { transition: transform .12s ease, background .12s ease; }
+.thumb .select-bar{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:34px;
+  display:flex;
+  align-items:center;
+  padding:4px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .12s ease;
+  background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+  border-top-left-radius:8px;
+  border-top-right-radius:8px;
+}
+.thumb:hover .select-bar{ opacity:1; pointer-events:auto; }
+
+/* circular selection button */
+.select-btn{
+  width:22px;
+  height:22px;
+  min-width:22px;
+  border-radius:50%;
+  border:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  background: rgba(255,255,255,0.75);
+  opacity:0.75;
+  margin-left:6px;
+  padding:0;
+  transition:opacity .12s ease, background-color .12s ease, transform .12s ease;
+}
+.select-btn svg{ width:12px; height:12px; display:block; color:rgba(0,0,0,0.6); opacity:0; /* keep check mark transparent as requested */ pointer-events:none; }
+
+/* hover makes circle less transparent */
+.select-btn:hover{ opacity:0.5; }
+
+/* selected state: circle becomes blue, checkmark stays transparent per spec */
+.thumb.selected .select-btn{ background: #2b82ff; opacity:1; }
+.thumb.selected .select-btn svg{ opacity:0; }
+
+/* thumbnail appears smaller when selected, and background goes grey to show freed space */
+.thumb.selected{
+  transform: scale(0.92);
+  background: #e6e9ec;
+}
+
+/* keep layout stable: ensure transform-origin top-left so shrink looks consistent */
+.thumb{ transform-origin: center center; }
+
+/* Top-strip replacement for selection mode */
+.top-strip .select-mode-left, .top-strip .select-mode-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.top-strip .select-count{
+  font-weight:700;
+}
+
+/* ensure new buttons use same hover square as other top buttons */
+.top-strip .top-btn.select-cancel, .top-strip .top-btn.select-trash{
+  width:44px;height:44px;border-radius:10px;padding:0;border:0;background:transparent;cursor:pointer;
+}
+
+
+
+/* Force the checkmark inside select button to be fully transparent and center it */
+.select-btn { display:inline-flex; align-items:center; justify-content:center; }
+.select-btn svg { opacity: 0 !important; pointer-events: none !important; width:12px; height:12px; }
+
+/* Ensure select-bar visible on hover */
+.select-bar { opacity: 0; pointer-events: none; transition: opacity .12s ease; }
+.thumb:hover .select-bar { opacity: 1; pointer-events: auto; }
+
+/* If thumb is selected, keep the bar visible even after mouse leaves (user requested) */
+.thumb.selected .select-bar { opacity: 1 !important; pointer-events: auto !important; }
+
+/* Make the select-mode-left inline and flush with left edge (no extra top strip) */
+.top-strip .select-mode-left{
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  position: static;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  z-index: 5;
+}
+/* restore original layout for .top-left (remove artificial padding) */
+.top-strip .top-left { padding-left: 0 !important; }
+ /* reserve space for cancel button area; adjust if your menu-toggle is wider */
+
+
+/* make nav overlay buttons show pointer on hover */
+.nav-overlay.show:hover{ cursor: pointer; }
+
+
+/* ensure nav overlay shows grabbing/pointer cursor on hover/active */
+.nav-overlay.show{ cursor: grab; }
+.nav-overlay.show:hover{ cursor: pointer; }
+.nav-overlay.show:active{ cursor: grabbing; }
