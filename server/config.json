@@ -1,0 +1,11 @@
+{
+    "server_port": 8080,
+    "storage_root": "../../localphotos",
+    "db_path": "../../localphotos/metadata.db",
+    "jwt_secret": "REPLACE_WITH_LONG_RANDOM_SECRET",
+    "timezone": "Europe/Moscow",
+    "max_upload_mb": 20,
+    "thumbnail_size": 300,
+    "allow_anonymous_shared": false,
+    "disable_clamav": true
+}
