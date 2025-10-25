@@ -13,7 +13,7 @@ or wherever your program and ```config.json``` is located. This will create a ``
 ```
 so once you've managed to follow those steps, the site is already running, so you can just type ```*youreserverip/port```. You can always change the port in ```config.json```, but ```8080``` is put by default. At the site, you can choose wheather to upload files to shared ("Общее"), those photos could see any users of your wifi (even that are not registred), or private ("Мое"), those can see only you (and the server administrator, of coarse:>). Everething else is user friendly, it's easily to get along, so youre free to go!
 
-##Installation:
+## Installation:
 1. Install C++, gcc, g++ and Ninja on your server.
 2. To install all libraries, execute:
 ```
